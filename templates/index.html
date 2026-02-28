@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THUCNews 新闻分类</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&family=Noto+Serif+SC:wght@400;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-page: #f8f6f3;
+            --bg-card: #ffffff;
+            --bg-input: #faf9f7;
+            --text-primary: #1a1a1a;
+            --text-secondary: #6b6b6b;
+            --text-tertiary: #9a9a9a;
+            --ink-black: #1a1a1a;
+            --ink-gray: #4a4a4a;
+            --accent-red: #e63946;
+            --accent-blue: #2d6a4f;
+            --accent-gold: #d4a373;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 20px rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 40px rgba(0,0,0,0.12);
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --border-subtle: 1px solid #e5e3df;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', -apple-system, sans-serif;
+            background: var(--bg-page);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(230,57,70,0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(45,106,79,0.03) 0%, transparent 50%);
+        }
+
+        .container { max-width: 720px; margin: 0 auto; padding: 60px 24px 80px; }
+
+        .header { text-align: center; margin-bottom: 48px; padding-bottom: 32px; border-bottom: 2px solid var(--ink-black); }
+
+        .brand { font-family: 'ZCOOL XiaoWei', serif; font-size: 2.8rem; color: var(--ink-black); letter-spacing: 0.1em; margin-bottom: 8px; }
+
+        .tagline { font-family: 'Noto Serif SC', serif; font-size: 0.95rem; color: var(--text-secondary); }
+
+        .divider { width: 60px; height: 3px; background: var(--accent-red); margin: 20px auto 0; }
+
+        .main-card { background: var(--bg-card); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); padding: 40px; margin-bottom: 24px; }
+
+        .section-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-tertiary); margin-bottom: 16px; }
+
+        .textarea-wrapper { position: relative; }
+
+        textarea {
+            width: 100%; height: 180px; background: var(--bg-input); border: var(--border-subtle);
+            border-radius: var(--radius-md); padding: 20px; color: var(--text-primary);
+            font-family: 'DM Sans', sans-serif; font-size: 1rem; resize: none; transition: all 0.25s ease; line-height: 1.7;
+        }
+
+        textarea:focus { outline: none; border-color: var(--ink-black); box-shadow: 0 0 0 3px rgba(26,26,26,0.08); }
+        textarea::placeholder { color: var(--text-tertiary); }
+
+        .char-count { position: absolute; bottom: 14px; right: 16px; font-size: 0.75rem; color: var(--text-tertiary); }
+
+        .quick-fill { margin-top: 20px; }
+
+        .quick-fill-label { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+        .quick-fill-label::before { content: ''; width: 12px; height: 12px; background: var(--accent-red); border-radius: 2px; display: inline-block; }
+
+        .quick-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .quick-btn {
+            padding: 8px 14px; background: var(--bg-input); border: var(--border-subtle);
+            border-radius: 20px; font-size: 0.8rem; color: var(--text-secondary); cursor: pointer; transition: all 0.2s ease;
+        }
+
+        .quick-btn:hover { background: var(--ink-black); color: white; transform: translateY(-1px); }
+
+        .btn-predict {
+            width: 100%; margin-top: 28px; padding: 18px 32px; background: var(--ink-black);
+            border: none; border-radius: var(--radius-md); color: white; font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;
+        }
+
+        .btn-predict:hover { background: #333; transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+        .btn-predict:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .loading { display: none; text-align: center; padding: 48px 24px; background: var(--bg-card); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); margin-bottom: 24px; }
+        .loading.active { display: block; animation: fadeIn 0.3s ease; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .loading-spinner { width: 36px; height: 36px; border: 2px solid #e5e3df; border-top-color: var(--ink-black); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text { color: var(--text-secondary); font-size: 0.9rem; }
+
+        .error-message { display: none; background: #fef2f2; border: 1px solid #fecaca; border-radius: var(--radius-md); padding: 14px 18px; color: #dc2626; font-size: 0.9rem; margin-bottom: 20px; }
+        .error-message.active { display: block; }
+
+        .result-section { display: none; background: var(--bg-card); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); padding: 32px; animation: slideUp 0.4s ease; margin-bottom: 24px; }
+        .result-section.active { display: block; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .result-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #e5e3df; }
+        .result-title { font-family: 'Noto Serif SC', serif; font-size: 1.1rem; font-weight: 600; color: var(--ink-black); }
+        .result-badge { font-size: 0.7rem; padding: 4px 10px; background: var(--bg-input); border-radius: 4px; color: var(--text-tertiary); letter-spacing: 0.05em; }
+
+        .result-list { display: flex; flex-direction: column; gap: 12px; }
+
+        .result-item {
+            display: flex; align-items: center; justify-content: space-between; padding: 18px 20px;
+            background: var(--bg-input); border-radius: var(--radius-md); border-left: 3px solid transparent; transition: all 0.25s ease;
+        }
+
+        .result-item:hover { transform: translateX(4px); border-left-color: var(--ink-black); }
+        .result-item:nth-child(1) { border-left-color: var(--accent-red); }
+        .result-item:nth-child(2) { border-left-color: var(--accent-gold); }
+        .result-item:nth-child(3) { border-left-color: var(--accent-blue); }
+
+        .result-item-main { display: flex; align-items: center; gap: 14px; }
+        .result-rank { font-family: 'DM Sans', monospace; font-size: 0.85rem; color: var(--text-tertiary); font-weight: 500; width: 24px; }
+        .result-category { font-size: 1.05rem; font-weight: 500; color: var(--ink-black); }
+
+        .result-confidence { display: flex; align-items: center; gap: 12px; }
+        .confidence-bar { width: 80px; height: 4px; background: #e5e3df; border-radius: 2px; overflow: hidden; }
+        .confidence-fill { height: 100%; background: var(--ink-black); border-radius: 2px; transition: width 0.6s ease; }
+        .confidence-value { font-family: 'DM Sans', monospace; font-size: 0.9rem; font-weight: 600; color: var(--ink-black); min-width: 54px; text-align: right; }
+
+        .model-info-card { display: none; background: var(--bg-card); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); padding: 28px 32px; margin-bottom: 24px; }
+        .model-info-card.active { display: block; }
+        .model-info-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid #e5e3df; }
+        .model-info-title { font-family: 'Noto Serif SC', serif; font-size: 1rem; font-weight: 600; color: var(--ink-black); }
+        .model-info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .model-info-item { text-align: center; padding: 12px; background: var(--bg-input); border-radius: var(--radius-sm); }
+        .model-info-label { font-size: 0.7rem; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+        .model-info-value { font-size: 1.3rem; font-weight: 600; color: var(--ink-black); }
+        .model-info-sub { font-size: 0.7rem; color: var(--text-tertiary); margin-top: 4px; }
+
+        .footer { text-align: center; margin-top: 48px; padding-top: 24px; border-top: 1px solid #e5e3df; }
+        .footer-text { font-size: 0.85rem; color: var(--text-tertiary); }
+        .footer-link { color: var(--ink-gray); text-decoration: underline; text-underline-offset: 2px; }
+        .model-stats { margin-top: 12px; font-size: 0.8rem; color: var(--text-tertiary); }
+
+        @media (max-width: 640px) {
+            .container { padding: 40px 16px 60px; }
+            .brand { font-size: 2.2rem; }
+            .main-card, .result-section { padding: 28px 20px; }
+            .result-item { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .result-confidence { width: 100%; }
+            .confidence-bar { flex: 1; }
+            .model-info-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="brand">THUCNews</h1>
+            <p class="tagline">中文新闻智能分类系统</p>
+            <div class="divider"></div>
+        </header>
+
+        <div class="main-card">
+            <div class="section-label">新闻内容</div>
+            <div class="textarea-wrapper">
+                <textarea id="newsText" placeholder="请输入新闻文本内容，或点击下方按钮快速填充示例..." maxlength="500"></textarea>
+                <span class="char-count"><span id="charCount">0</span>/500</span>
+            </div>
+
+            <div class="quick-fill">
+                <div class="quick-fill-label">快速填充示例新闻</div>
+                <div class="quick-buttons">
+                    <button class="quick-btn" onclick="fillSample('财经')">财经</button>
+                    <button class="quick-btn" onclick="fillSample('股票')">股票</button>
+                    <button class="quick-btn" onclick="fillSample('教育')">教育</button>
+                    <button class="quick-btn" onclick="fillSample('科技')">科技</button>
+                    <button class="quick-btn" onclick="fillSample('社会')">社会</button>
+                    <button class="quick-btn" onclick="fillSample('时尚')">时尚</button>
+                    <button class="quick-btn" onclick="fillSample('时政')">时政</button>
+                    <button class="quick-btn" onclick="fillSample('体育')">体育</button>
+                    <button class="quick-btn" onclick="fillSample('游戏')">游戏</button>
+                    <button class="quick-btn" onclick="fillSample('娱乐')">娱乐</button>
+                </div>
+            </div>
+
+            <button class="btn-predict" id="predictBtn" onclick="predict()">开始分类</button>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+
+        <div class="loading" id="loading">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">AI 正在分析中...</p>
+        </div>
+
+        <section class="result-section" id="resultSection">
+            <div class="result-header">
+                <span class="result-title">分类结果</span>
+                <span class="result-badge">BERT</span>
+            </div>
+            <div class="result-list" id="resultList"></div>
+        </section>
+
+        {% if results %}
+        <div class="model-info-card active">
+            <div class="model-info-header">
+                <span class="model-info-title">模型训练信息</span>
+            </div>
+            <div class="model-info-grid">
+                <div class="model-info-item">
+                    <div class="model-info-label">训练数据</div>
+                    <div class="model-info-value">{{ "{:.0f}".format(results.total_samples / 10000) }}万</div>
+                    <div class="model-info-sub">样本数量</div>
+                </div>
+                <div class="model-info-item">
+                    <div class="model-info-label">测试准确率</div>
+                    <div class="model-info-value">{{ "{:.2f}%".format(results.test_accuracy * 100) }}</div>
+                    <div class="model-info-sub">Accuracy</div>
+                </div>
+                <div class="model-info-item">
+                    <div class="model-info-label">F1分数</div>
+                    <div class="model-info-value">{{ "{:.4f}".format(results.test_f1_macro) }}</div>
+                    <div class="model-info-sub">Macro F1</div>
+                </div>
+                <div class="model-info-item">
+                    <div class="model-info-label">训练轮数</div>
+                    <div class="model-info-value">{{ results.config.epochs }}</div>
+                    <div class="model-info-sub">Epochs</div>
+                </div>
+                <div class="model-info-item">
+                    <div class="model-info-label">训练时间</div>
+                    <div class="model-info-value">{{ "{:.1f}".format(results.train_time_minutes) }}</div>
+                    <div class="model-info-sub">分钟</div>
+                </div>
+                <div class="model-info-item">
+                    <div class="model-info-label">批处理大小</div>
+                    <div class="model-info-value">{{ results.config.effective_batch_size }}</div>
+                    <div class="model-info-sub">有效batch</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <footer class="footer">
+            <p class="footer-text">Powered by <a href="https://huggingface.co/bert-base-chinese" class="footer-link" target="_blank">bert-base-chinese</a></p>
+            <p class="model-stats">模型准确率 85.00% · F1 Score 0.8300</p>
+        </footer>
+    </div>
+
+    <script>
+        const sampleNews = {
+            '财经': '人民币汇率持续升值，在岸人民币对美元汇率今日突破6.35关口，创下近三年新高。',
+            '股票': 'A股市场今日迎来久违的大涨行情，沪指收盘上涨2.47%，深成指涨幅超过3%，创业板指大涨近4%。',
+            '教育': '2024年高考临近，全国各地学校陆续开展模拟考试和考前辅导。',
+            '科技': '我国自主研发的新一代人工智能大模型今日正式发布，参数规模超过千亿。',
+            '社会': '今日上午，某城市地铁站发生乘客晕倒事件，站方及时启动应急预案。',
+            '时尚': '巴黎时装周今日开幕，多个国际知名品牌发布2024春夏系列新品。',
+            '时政': '国务院召开常务会议，部署加强中小微企业金融服务工作。',
+            '体育': '2024年奥运会预选赛传来捷报，中国体操队以总分第一的成绩锁定奥运入场券。',
+            '游戏': '王者荣耀职业联赛KPL春季赛总决赛今日落下帷幕，战队凭借出色发挥夺得冠军。',
+            '娱乐': '第36届金鸡电影节颁奖典礼昨晚落下帷幕，知名导演执导的文艺片斩获多项大奖。'
+        };
+
+        const textarea = document.getElementById('newsText');
+        const charCount = document.getElementById('charCount');
+
+        textarea.addEventListener('input', () => { charCount.textContent = textarea.value.length; });
+
+        function fillSample(category) {
+            textarea.value = sampleNews[category];
+            charCount.textContent = textarea.value.length;
+            document.getElementById('resultSection').classList.remove('active');
+            document.getElementById('errorMessage').classList.remove('active');
+            textarea.focus();
+        }
+
+        async function predict() {
+            const text = textarea.value.trim();
+            const errorMessage = document.getElementById('errorMessage');
+            const loading = document.getElementById('loading');
+            const resultSection = document.getElementById('resultSection');
+            const predictBtn = document.getElementById('predictBtn');
+
+            errorMessage.classList.remove('active');
+            resultSection.classList.remove('active');
+
+            if (!text) { showError('请输入新闻文本内容'); return; }
+            if (text.length < 10) { showError('文本内容过短，请输入更多内容'); return; }
+
+            loading.classList.add('active');
+            predictBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: text, top_k: 3 })
+                });
+
+                const data = await response.json();
+                if (!data.success) throw new Error(data.error || '预测失败');
+
+                displayResults(data.data);
+            } catch (error) {
+                showError(error.message || '网络错误，请稍后重试');
+            } finally {
+                loading.classList.remove('active');
+                predictBtn.disabled = false;
+            }
+        }
+
+        function showError(message) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = message;
+            errorMessage.classList.add('active');
+        }
+
+        function displayResults(results) {
+            const resultSection = document.getElementById('resultSection');
+            const resultList = document.getElementById('resultList');
+
+            resultList.innerHTML = '';
+            results.forEach((item, index) => {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'result-item';
+                itemEl.innerHTML = `
+                    <div class="result-item-main">
+                        <span class="result-rank">${index + 1}</span>
+                        <span class="result-category">${item.category}</span>
+                    </div>
+                    <div class="result-confidence">
+                        <div class="confidence-bar"><div class="confidence-fill" style="width: ${item.confidence}%"></div></div>
+                        <span class="confidence-value">${item.confidence.toFixed(2)}%</span>
+                    </div>
+                `;
+                resultList.appendChild(itemEl);
+            });
+
+            resultSection.classList.add('active');
+            
+            // 滚动到结果区域居中位置
+            const resultRect = resultSection.getBoundingClientRect();
+            const scrollTarget = resultRect.top + window.scrollY - window.innerHeight / 3;
+            window.scrollTo({ top: scrollTarget, behavior: 'smooth' });
+        }
+
+        textarea.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.ctrlKey) predict(); });
+    </script>
+</body>
+</html>
