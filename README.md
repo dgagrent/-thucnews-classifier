@@ -36,6 +36,21 @@
 - transformers
 - CUDA (GPU推荐)
 
+## 数据集下载
+
+本项目使用 THUCNews 数据集，需要单独下载：
+
+**下载地址**：https://github.com/THUCNews
+
+**本地路径配置**：
+训练脚本 `bert_text_classifier.py` 中 `data_path` 默认配置为：
+```python
+data_path = r'D:\\浏览器下载\\数据集\\THUCNews'
+```
+请根据实际情况修改为本地数据集路径。
+
+## 项目结构
+
 ## 项目结构
 
 ```
